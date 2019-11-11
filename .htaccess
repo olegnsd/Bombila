@@ -1,0 +1,6 @@
+<Files admin.html>
+AuthType Basic
+AuthName "Authentication Required"
+AuthUserFile /home/bombila/web/bombila.holding.bz/public_html/.htpasswd
+Require valid-user
+</Files>

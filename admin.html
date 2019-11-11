@@ -1,0 +1,1629 @@
+<!-- 
+  Автор и владелец кода - Станислав Романенко
+  Копирование без разрешения запрещено
+  По всем вопросам: stanislav.romanenko@gmail.com
+
+  Я разрешаю использование этого кода компании "Милитари Холдинг" в тестовом режиме до конца сентября 2019 года.
+  Далее, если компания "Милитари Холдинг" не выкупит права на использование - использование будет запрещено.
+-->
+
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Панель администратора/диспетчера</title>  
+  <link rel="shortcut icon" href="https://bombila.holding.bz/ico/favicon.png" type="image/png">  
+  <script src="/ckeditor5-build-classic/ckeditor.js"></script>  
+  
+  <style type="text/css">
+
+#menu{
+background-color:#00C0C0;
+width:200px;
+height:600px;
+float:left;
+}
+
+.menuLink {
+  margin: 5px;
+}
+
+#content {
+background-color:#8080FF;
+height:600px;
+}
+
+#users {
+background-color:#80AAFF;
+height:550px;
+width:450px;
+float:left;
+overflow: auto;
+}
+
+#users-table-container {
+  width: 100%;
+  height: 500px;
+  overflow: auto;
+}
+
+#users-table {
+  width:100%;
+}
+
+#users-table th {
+  background-color: #dddddd;  
+}
+
+#users-table tr:nth-child(odd) {
+  background-color: #5DFFFD;  
+}
+
+#users-table tr:nth-child(even) {
+  background-color: #00FFFC;    
+}
+
+#bombilas-div {
+background-color:#80AAFF;
+height:550px;
+width:450px;
+float:left;
+overflow: auto;
+}
+
+#bombilas {
+  width:100%;
+}
+
+#bombilas th {
+  background-color: #dddddd;  
+}
+
+#bombilas tr:nth-child(odd) {
+  background-color: #5DFFFD;  
+}
+
+#bombilas tr:nth-child(even) {
+  background-color: #00FFFC;    
+}
+
+.bombila {
+	cursor: pointer;	
+}
+
+#photo-control-content {
+  padding: 0px;
+}
+
+#cert-img-div, #sts-img-div, #auto-img-div {
+  display:block;	
+	width: 250px;	
+	height: 150px;  
+	overflow: hidden;
+  padding: 5px;
+}
+
+#cert-img-state, #sts-img-state, #auto-img-state {
+  display:inline-block;	
+	width: 250px;
+	color: white;
+  padding: 5px;
+}
+
+#cert-img-buttons, #sts-img-buttons, #auto-img-buttons {
+  display:inline-block;	
+	width: 250px;	
+  margin: 5px;
+}
+
+#cert-img, #sts-img, #auto-img {
+/*	width: 298px;
+	height: 190px; */
+
+  width: 100%;
+  height: 100%;
+
+	object-fit:cover;           
+}
+
+#editor {
+  background: var(--ck-sample-color-white);
+  box-shadow: 2px 2px 2px rgba(0,0,0,.1);
+  border: 1px solid #DFE4E6;      
+  border-bottom-color: #cdd0d2;
+  border-right-color: #cdd0d2;
+}
+
+.ck.ck-editor {
+  box-shadow: 2px 2px 2px rgba(0,0,0,.1);
+}
+
+.ck.ck-content {
+  font-size: 1em;
+  /* line-height: 1.0em; */
+  margin-bottom: 0.8em;
+  min-height: 200px;
+  height: 400px;
+  /* padding: 1.5em 2em; */
+}
+
+p {
+  margin: 0px;
+  padding: 0px;
+}
+
+#orders {
+background-color:#80AAFF;
+height:550px;
+width:800px; /*450px*/
+float:left;
+
+}
+
+#orders-table-container {
+  width: 100%;
+  height: 500px;
+  overflow: auto;
+}
+
+#orders-table {
+  width: 100%;
+}
+
+#orders-table th {
+  background-color: #dddddd;  
+}
+
+#orders-table tr:nth-child(odd) {
+  background-color: #5DFFFD;  
+}
+
+#orders-table tr:nth-child(even) {
+  background-color: #00FFFC;    
+}
+
+
+#chats {
+
+}
+
+#chats #chats-users {
+  background-color:#80AAFF;
+  height:550px;
+  width:250px;
+  float:left;
+  overflow: auto;
+}
+
+#chats-users .chat-user {
+  cursor: pointer;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+#chats #chat {
+  float:left;
+}
+
+#chats #chat #chat-messages {
+  background-color: #56A0FF;
+  width: 400px;
+  height: 480px;
+  overflow: auto;  
+}
+
+#chats #chat #chat-send-panel {
+  background-color: #9845FF;
+  height: 70px;
+  /*line-height: 60px;*/
+  width: 400px; 
+}
+
+#chat-send-panel textarea, #chat-send-panel textarea {
+  display: inline-block;
+  vertical-align: top;
+  line-height: normal;
+  margin: 0;
+}
+
+.chat-message {
+  max-width: 200px;
+  background-color: #0DFCEB;
+  margin: 5px;
+}
+
+  </style>
+</head>
+<body>
+
+<!--   <div>
+    <img src="bombila_logo.png" width="50" height="50"> Бомбила
+  </div> -->
+
+	<div id="menu">
+    <a id="usersLink" style="display:block" class="menuLink" href="#" onclick="return showContent('users');">Пользователи</a>
+		<a id="photoControlLink" style="display:block" class="menuLink" href="#" onclick="return showContent('photoControl');">Фотоконтроль</a>
+    <a id="userAgreementLink" style="display:block" class="menuLink" href="#" onclick="return showContent('userAgreement');">Пользовательское соглашение</a>
+    <a id="lessonsLink" style="display:block" class="menuLink" href="#" onclick="return showContent('lessons');">Уроки</a>
+    <a id="chatsLink" style="display:block" class="menuLink" href="#" onclick="return showContent('chats');">Чаты</a>
+    <a id="tariffsLink" style="display:block" class="menuLink" href="#" onclick="return showContent('tariffs');">Тарифы</a>
+    <a id="ordersLink" style="display:block" class="menuLink" href="#" onclick="return showContent('orders');">Заказы</a>
+    <a id="chatsLink" style="display:block" class="menuLink" href="#" onclick="return showContent('chats');">Чаты</a>
+
+	</div>
+
+	<div id="content">
+
+    <div id="users">
+      Пользователи
+
+      <input id="user-search-input" type="text" value="" autocomplete="off"><button onclick="doUserSearch()">Поиск</button>
+
+      <div id="users-table-container">
+        <table id="users-table">
+        </table>    
+      </div>
+      Всего: <span id="total-users"></span>
+
+    </div>
+
+		<div id="photoControl">
+			Фотоконтроль<br>
+
+      <div id="bombilas-div">
+
+        <select id="photo-control-select" onchange="getPhotoControlBombilas( this.value )">
+          <option value="all">Все</option>
+          <option value="for_approval">На одобрение</option>
+          <option value="approved">Одобренные</option>
+          <option value="not_approved">Отклонённые</option>
+        </select>   
+
+        <input id="bombila-search-input" type="text" value="" autocomplete="off"><button onclick="doBombilaSearch()">Поиск</button>
+
+        <table id="bombilas">
+        </table>
+      </div>
+
+      <div id="photo-control-content">
+
+        <span id="photo-control-content-fullname" style="color:white; margin-left: 10px;">Имя:</span><br>        
+        <span id="photo-control-content-phone" style="color:white; margin-left: 10px;">Тел.:</span><br>
+
+        <div style="float:left; margin:10px; color:white;">
+          <span style="color:white;">Водительское удостоверение</span><br>
+          <div id="cert-img-div"><a href=""><img id="cert-img" src="" alt="Нет фото" style="color:white;"></a></div>
+          <div id="cert-img-state">Статус: </div><br>
+          <div id="cert-img-buttons">
+            <button onclick="approvePhotoControlPhoto( window.bombila, 'cert' )">Одобрить</button>
+            <button onclick="declinePhotoControlPhoto( window.bombila, 'cert' )">Отказать</button>
+          </div>
+        </div>
+<!--         <br>      
+        <br>    -->
+        <div style="float:left; margin:10px; color:white;"> 
+         <span style="color:white;"> СТС</span><br>     
+          <div id="sts-img-div"><a href=""><img id="sts-img" src="" alt="Нет фото" style="color:white;"></a></div>
+          <div id="sts-img-state">Статус: </div><br>
+          <div id="sts-img-buttons">
+            <button onclick="approvePhotoControlPhoto( window.bombila, 'sts' )">Одобрить</button>
+            <button onclick="declinePhotoControlPhoto( window.bombila, 'sts' )">Отказать</button>
+          </div>
+        </div>
+<!--         <br>
+        <br>   -->
+        <div style="float:left; margin:10px; color:white;">  
+          <span style="color:white;">Фото автомобиля</span><br>
+          <div id="auto-img-div"><a href=""><img id="auto-img" src="" alt="Нет фото" style="color:white;"></a></div>
+          <div id="auto-img-state">Статус: </div><br>
+          <div id="auto-img-buttons">
+            <button onclick="approvePhotoControlPhoto( window.bombila, 'auto' )">Одобрить</button>
+            <button onclick="declinePhotoControlPhoto( window.bombila, 'auto' )">Отказать</button>
+          </div>
+        </div>   
+
+      </div>    
+        
+		</div>
+
+    <div id="userAgreement">
+      Пользовательское соглашение<br>
+
+      <div id="editor">
+      </div>
+
+       <button onclick="saveUserAgreement()">Сохранить</button>
+    </div>
+
+    <div id="lessons">
+      Уроки<br>
+      <br>
+      Уроки задаются на youtube через аккаунт<br>
+      <br>
+      ОАО Конструктор Империй<br>
+      ki0001026@gmail.com<br>
+      <br>
+      добавлением видео в плейлист "Бомбила. Уроки"<br>
+      <br>
+      <a href="https://www.youtube.com/playlist?list=PLrpSrPf1KKB59CuRmuEQleQwBDsm_vH_t">Ссылка на плейлист</a><br>
+      <br>
+      Приложение загружает уроки из этого плейлиста.<br>
+    </div>
+
+
+    <div id="tariffs">
+      Тарифы<br>
+      <br>
+
+      <table>
+
+        <tr>
+          <td>Обычный</td>
+          <td> </td>
+          <td> </td>
+        </tr>           
+
+        <tr>
+          <td>Километр пути:</td>
+          <td><input id="km-normal-input" type="number" size="10" step="0.01" value=""> р.</td>
+          <td><button onclick="saveKmNormal()">Сохранить</button></td>
+        </tr>
+
+        <tr>
+          <td>Минута пути:</td>
+          <td><input id="minute-normal-input" type="number" size="10" step="0.01" value=""> р.</td>
+          <td><button onclick="saveMinuteNormal()">Сохранить</button></td>
+        </tr> 
+
+        <tr>
+          <td>Посадка:</td>
+          <td><input id="get-in-normal-input" type="number" size="10" step="0.01" value=""> р.</td>
+          <td><button onclick="saveGetInNormal()">Сохранить</button></td>
+        </tr>         
+
+        <tr>
+          <td>Минимальная стоимость поездки: </td>
+          <td><input id="minimal-price-normal-input" type="number" step="0.01" value=""> р.</td>
+          <td><button onclick="saveMinimalPriceNormal()">Сохранить</button></td>
+        </tr>    
+
+        <tr>
+          <td><br></td>
+          <td> </td>
+          <td> </td>
+        </tr>  
+
+        <tr>
+          <td>Комбинированный</td>
+          <td> </td>
+          <td> </td>
+        </tr>   
+
+        <tr>
+          <td>Километр пути: </td>
+          <td><input id="km-combined-input" type="number" step="0.01" value=""> р.</td>
+          <td><button onclick="saveKmCombined()">Сохранить</button></td>
+        </tr>
+
+        <tr>
+          <td>Минута пути: </td>
+          <td><input id="minute-combined-input" type="number" step="0.01" value=""> р.</td>
+          <td><button onclick="saveMinuteCombined()">Сохранить</button></td>
+        </tr>        
+
+        <tr>
+          <td>Посадка: </td>
+          <td><input id="get-in-combined-input" type="number" step="0.01" value=""> р.</td>
+          <td><button onclick="saveGetInCombined()">Сохранить</button></td>
+        </tr>        
+
+        <tr>
+          <td>Минимальная стоимость поездки: </td>
+          <td><input id="minimal-price-combined-input" type="number" step="0.01" value=""> р.</td>
+          <td><button onclick="saveMinimalPriceCombined()">Сохранить</button></td>
+        </tr>
+
+        <tr>
+          <td><br></td>
+          <td></td>
+          <td></td>
+        </tr>        
+
+        <tr>
+          <td>Коммиссия </td>
+          <td><input id="commission-input" type="number" step="0.01" value=""> %</td>
+          <td><button onclick="setCommission()">Сохранить</button></td>
+        </tr>        
+
+        <tr>
+          <td><br></td>
+          <td></td>
+          <td></td>
+        </tr>  
+
+        <tr>
+          <td>Ожидание бесплатно: </td>
+          <td><input id="waiting-minutes-free-input" type="number" step="0.01" value=""> мин.</td>
+          <td><button onclick="saveWaitingMinutesFree()">Сохранить</button></td>
+        </tr>  
+
+        <tr>
+          <td>Стоимость минуты ожидания: </td>
+          <td><input id="waiting-minute-price-input" type="number" step="0.01" value=""> р.</td>
+          <td><button onclick="saveWaitingMinutePrice()">Сохранить</button></td>
+        </tr>   
+
+        <tr>
+          <td>Штраф за отмену ( для пассажира ):</td>
+          <td><input id="fine-for-cancel-input" type="number" step="0.01" value=""> р.</td>
+          <td><button onclick="saveFineForCancel()">Сохранить</button></td>
+        </tr>           
+
+      </table>
+
+    </div>
+
+    <div id="orders">
+      Заказы
+
+      <input id="order-search-input" type="text" value="" autocomplete="off"><button onclick="doOrderSearch()">Поиск</button>
+
+      <div id="orders-table-container">
+        <table id="orders-table">
+        </table>      
+      </div>
+      Всего: <span id="total-orders"></span>      
+
+    </div>    
+
+    <div id="chats">
+      Чаты<br>
+
+      <div id="chats-users">
+
+      </div>
+
+      <div id="chat">
+        <div id="chat-messages"></div>
+        <div id="chat-send-panel" data-to-phone="">
+          <textarea style="display:inline-block;" type="text" cols="30" rows="3" autocomplete="off"></textarea>
+          <button style="display:inline-block;" onclick="sendChatMessage()">Отправить</button>
+        </div>
+      </div>    
+        
+    </div>
+
+	</div>
+
+  Автор и владелец - Станислав Романенко<br>
+  Копирование без разрешения запрещено<br>
+  По всем вопросам: stanislav.romanenko@gmail.com<br>
+  <br>
+  Я разрешаю использование этого сайта компании "Милитари Холдинг" в тестовом режиме до конца сентября 2019 года.<br>
+  Далее, если компания "Милитари Холдинг" не выкупит права на использование - использование будет запрещено.<br>
+
+</body>
+
+<script>
+
+var AUTH_KEY = '2pxvkjUsDUlViUQwbqg9KJQcxSezzyFgck2XUIR5';
+
+var bombila;
+var editor;
+
+init();
+
+clickFirstMenuElement();
+
+function init() {
+
+  ClassicEditor
+    .create( document.querySelector( '#editor' ), {
+        toolbar: [ 'heading', '|', 'bold', 'italic', 'underline', 'bulletedList', 'numberedList', 'insertTable', 'undo', 'redo' ],
+        heading: {
+            options: [
+                { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' }
+            ]
+        }
+    } )
+    .then( editor => {
+      window.editor = editor;
+    } )
+    .catch( err => {
+      console.error( err.stack );
+    } );  
+
+    ClassicEditor.builtinPlugins.map( plugin => plugin.pluginName );
+}
+
+function clickFirstMenuElement() {
+
+	document.querySelector('#menu #chatsLink').click();
+}
+
+function showContent(id) {
+
+  var divs = document.querySelectorAll('#content > div');
+  var div;
+
+  for(var i=0;i<divs.length;i++) {
+
+    div = divs[i];
+
+    if( div.getAttribute('id') == id )
+      div.style.display = 'block';
+    else
+      div.style.display = 'none';
+  }
+
+  if( id == 'users' ) {
+
+    getUsers();
+  }
+  else if( id == 'photoControl' ) {
+
+  	var select = document.querySelector('#photo-control-select');
+  	select.selectedIndex = 0;
+
+    document.querySelector('#cert-img').src = '';
+    document.querySelector('#sts-img').src = '';
+    document.querySelector('#auto-img').src = '';
+
+    document.querySelector('#cert-img-state').innerText = 'Статус:';
+    document.querySelector('#sts-img-state').innerText = 'Статус:';
+    document.querySelector('#auto-img-state').innerText = 'Статус:';
+
+  	getPhotoControlBombilas( select.value );
+  }
+  else if( id == 'userAgreement' ) {
+
+    getUserAgreement();
+  }
+  else if( id == 'lessons' ) {
+
+    // ничего не загружаем
+  }  
+  else if( id == 'tariffs' ) {
+
+    getTariffs();
+  }
+  else if( id == 'orders' ) {
+
+    getOrders();
+  }  
+  else if( id == 'chats' ) {
+
+    getChats();
+  }
+}
+
+function getUsers() {
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var json = JSON.parse( this.responseText );
+
+          fillUsersTable( json );
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };  
+
+  xmlhttp.open('GET', '/api/v0.17.0/users/list', true);
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);
+  xmlhttp.send();   
+}
+
+function doUserSearch() {
+
+  var text = document.querySelector('#user-search-input').value;
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var json = JSON.parse( this.responseText );
+
+          fillUsersTable( json );
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };  
+
+  xmlhttp.open('GET', '/api/v0.17.0/users/searchUsers?text='+text, true);
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);
+  xmlhttp.send();     
+}
+
+function fillUsersTable( json ) {
+
+  var usersTable = document.querySelector('#users-table');
+
+  while (usersTable.firstChild) {
+    usersTable.removeChild(usersTable.firstChild);
+  }
+
+  var userRow = document.createElement('tr');
+  // bombilaRow.innerText = json[i].firstname + ' ' + json[i].lastname;
+  userRow.className = 'bombilas-header';
+
+  var userFirstNameCol = document.createElement('th');
+  var userLastNameCol = document.createElement('th');
+  var userPhoneCol = document.createElement('th');
+
+  userFirstNameCol.innerText = 'Имя';
+  userLastNameCol.innerText = 'Фамилия';
+  userPhoneCol.innerText = 'Телефон';
+
+  userRow.appendChild( userFirstNameCol );
+  userRow.appendChild( userLastNameCol );
+  userRow.appendChild( userPhoneCol );
+
+  usersTable.appendChild( userRow );          
+
+  for(var i=0;i<json.length;i++) {
+
+    var userRow = document.createElement('tr');
+    userRow.setAttribute('data-phone', json[i].phone);
+    // bombilaRow.innerText = json[i].firstname + ' ' + json[i].lastname;
+    userRow.className = 'user';
+
+    var userFirstNameCol = document.createElement('td');
+    var userLastNameCol = document.createElement('td');
+    var userPhoneCol = document.createElement('td');
+
+    userFirstNameCol.innerText = json[i].firstname;
+    userLastNameCol.innerText = json[i].lastname;
+    userPhoneCol.innerText = json[i].phone;
+
+    userRow.appendChild( userFirstNameCol );
+    userRow.appendChild( userLastNameCol );
+    userRow.appendChild( userPhoneCol );
+
+    usersTable.appendChild( userRow );
+  }    
+
+  document.querySelector('#total-users').innerText = json.length;
+}
+
+function getPhotoControlBombilas(state) {
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var json = JSON.parse( this.responseText );
+
+          fillBombilasTable( json );
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };  
+  
+  xmlhttp.open('GET', '/api/v0.17.0/photoControl/getBombilas?state='+state, true);
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);
+  xmlhttp.send();	
+}
+
+function fillBombilasTable(json) {
+
+  var bombilasTable = document.querySelector('#bombilas');
+
+  while (bombilasTable.firstChild) {
+    bombilasTable.removeChild(bombilasTable.firstChild);
+  }
+
+  var bombilaRow = document.createElement('tr');
+  // bombilaRow.innerText = json[i].firstname + ' ' + json[i].lastname;
+  bombilaRow.className = 'bombilas-header';
+
+  var bombilaFirstNameCol = document.createElement('th');
+  var bombilaLastNameCol = document.createElement('th');
+  var bombilaPhoneCol = document.createElement('th');
+
+  bombilaFirstNameCol.innerText = 'Имя';
+  bombilaLastNameCol.innerText = 'Фамилия';
+  bombilaPhoneCol.innerText = 'Телефон';
+
+  bombilaRow.appendChild( bombilaFirstNameCol );
+  bombilaRow.appendChild( bombilaLastNameCol );
+  bombilaRow.appendChild( bombilaPhoneCol );
+
+  bombilasTable.appendChild( bombilaRow );          
+
+  for(var i=0;i<json.length;i++) {
+
+    var bombilaRow = document.createElement('tr');
+    bombilaRow.setAttribute('data-phone', json[i].phone);
+    bombilaRow.setAttribute('data-fullname', json[i].firstname + ' ' + json[i].lastname);    
+    // bombilaRow.innerText = json[i].firstname + ' ' + json[i].lastname;
+    bombilaRow.className = 'bombila';
+    bombilaRow.onclick = function(event) {
+      
+      console.log('!!!! onclick');
+
+      var source = event.target || event.srcElement;
+
+      if( source.tagName == 'TD' )
+        source = source.parentElement; // TR
+
+      console.log( source ); 
+      console.log( event.target );         
+      console.log( event.srcElement );         
+
+      window.bombila = source.getAttribute('data-phone');
+
+      document.querySelector('#photo-control-content-phone').innerText = 'Тел.: ' + window.bombila;
+      document.querySelector('#photo-control-content-fullname').innerText = 'Имя:  ' + source.getAttribute('data-fullname');
+
+      loadPhotoControlData( window.bombila );
+    }
+
+    var bombilaFirstNameCol = document.createElement('td');
+    var bombilaLastNameCol = document.createElement('td');
+    var bombilaPhoneCol = document.createElement('td');
+
+    bombilaFirstNameCol.innerText = json[i].firstname;
+    bombilaLastNameCol.innerText = json[i].lastname;
+    bombilaPhoneCol.innerText = json[i].phone;
+
+    bombilaRow.appendChild( bombilaFirstNameCol );
+    bombilaRow.appendChild( bombilaLastNameCol );
+    bombilaRow.appendChild( bombilaPhoneCol );
+
+    bombilasTable.appendChild( bombilaRow );
+  }  
+}
+
+function loadPhotoControlData(phone) {
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var json = JSON.parse( this.responseText );
+
+          var stateText;
+
+          for(var i=0;i<json.length;i++) {
+
+          	stateText = getPhotoStateText( json[i].state );
+
+          	if( json[i].type == 'cert' )
+		          document.querySelector('#cert-img-state').innerText = stateText;
+
+          	else if( json[i].type == 'sts' )
+		          document.querySelector('#sts-img-state').innerText = stateText;
+
+            else if( json[i].type == 'auto' )
+              document.querySelector('#auto-img-state').innerText = stateText;
+          }
+
+
+          var certImgDiv = document.querySelector('#cert-img-div');
+          var stsImgDiv = document.querySelector('#sts-img-div');
+          var autoImgDiv = document.querySelector('#auto-img-div');          
+
+          var certImgLink = '/files/photocontrol/'+phone+'/cert.jpg';
+          var stsImgLink = '/files/photocontrol/'+phone+'/sts.jpg';
+          var autoImgLink = '/files/photocontrol/'+phone+'/auto.jpg';
+
+          certImgDiv.querySelector('a').href = certImgLink;
+          certImgDiv.querySelector('#cert-img').src = certImgLink;
+
+          stsImgDiv.querySelector('a').href = stsImgLink;
+          stsImgDiv.querySelector('#sts-img').src = stsImgLink;
+
+          autoImgDiv.querySelector('a').href = autoImgLink;
+          autoImgDiv.querySelector('#auto-img').src = autoImgLink;
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };  
+  
+  xmlhttp.open('GET', '/api/v0.17.0/photoControl/getData?phone='+encodeURIComponent(phone), true);
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);
+  xmlhttp.send();	
+}
+
+function getPhotoStateText(state) {
+
+	if( state == 'for_approval' )
+		return 'Статус: на одобрение';
+
+	else if( state == 'approved' )
+		return 'Статус: одобрено';
+
+	else if( state == 'not_approved' )
+		return 'Статус: отказано';
+
+	return '';
+}
+
+function approvePhotoControlPhoto( phone, type ) {
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var stateText = getPhotoStateText( 'approved' );
+          document.querySelector('#'+type+'-img-state').innerText = stateText;
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };  
+  
+  xmlhttp.open('GET', '/api/v0.17.0/photoControl/approvePhoto?phone='+encodeURIComponent(phone)+'&type='+type, true);
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);
+  xmlhttp.send();   
+}
+
+function declinePhotoControlPhoto( phone, type ) {
+
+  var reason = prompt("Причина:", "");
+
+  if( reason == null )
+    return;
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var stateText = getPhotoStateText( 'not_approved' );
+          document.querySelector('#'+type+'-img-state').innerText = stateText;          
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };
+
+  var json = JSON.stringify({
+    phone:  phone,
+    type:   type,
+    reason: reason
+  });
+
+  xmlhttp.open('POST', '/api/v0.17.0/photoControl/declinePhoto', true);
+  xmlhttp.setRequestHeader("Content-Type", "application/json");  
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);  
+  xmlhttp.send(json);   
+}
+
+function doBombilaSearch() {
+
+  var text = document.querySelector('#bombila-search-input').value;
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var json = JSON.parse( this.responseText );
+
+          fillBombilasTable( json );
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };  
+
+  xmlhttp.open('GET', '/api/v0.17.0/photoControl/searchBombilas?text='+text, true);
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);  
+  xmlhttp.send();     
+}
+
+function getUserAgreement() {
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          window.editor.setData( this.responseText );
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };  
+
+  xmlhttp.open('GET', '/api/v0.17.0/userAgreement/get', true);
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);  
+  xmlhttp.send();       
+}
+
+function saveUserAgreement() {
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          alert('Сохранено');
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };
+
+  var text = window.editor.getData();
+
+  xmlhttp.open('POST', '/api/v0.17.0/userAgreement/save', true);
+  xmlhttp.setRequestHeader("Content-Type", "text/html");
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);  
+  xmlhttp.send(text);         
+}
+
+function getTariffs() {
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var json = JSON.parse( this.responseText );
+
+          for(var i=0;i<json.length;i++) {
+
+            if( json[i].name == 'km_normal' )
+              document.querySelector('#km-normal-input').value = json[i].value;
+
+            else if( json[i].name == 'km_combined' )
+              document.querySelector('#km-combined-input').value = json[i].value;
+
+            else if( json[i].name == 'minute_normal' )
+              document.querySelector('#minute-normal-input').value = json[i].value;
+
+            else if( json[i].name == 'minute_combined' )
+              document.querySelector('#minute-combined-input').value = json[i].value;    
+
+            else if( json[i].name == 'get_in_normal' )
+              document.querySelector('#get-in-normal-input').value = json[i].value;
+
+            else if( json[i].name == 'get_in_combined' )
+              document.querySelector('#get-in-combined-input').value = json[i].value;
+
+            else if( json[i].name == 'minimal_price_normal' )
+              document.querySelector('#minimal-price-normal-input').value = json[i].value;
+
+            else if( json[i].name == 'minimal_price_combined' )
+              document.querySelector('#minimal-price-combined-input').value = json[i].value;
+
+            else if( json[i].name == 'commission' )
+              document.querySelector('#commission-input').value = json[i].value;
+
+            else if( json[i].name == 'waiting_minutes_free' )
+              document.querySelector('#waiting-minutes-free-input').value = json[i].value;
+
+            else if( json[i].name == 'waiting_minute_price' )
+              document.querySelector('#waiting-minute-price-input').value = json[i].value;
+
+            else if( json[i].name == 'fine_for_cancel' )
+              document.querySelector('#fine-for-cancel-input').value = json[i].value;
+
+          }
+
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };  
+
+  xmlhttp.open('GET', '/api/v0.17.0/tariffs/list', true);
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);  
+  xmlhttp.send();     
+}
+
+function saveKmNormal() {
+
+  saveTariff( 'km_normal', document.querySelector('#km-normal-input').value );
+}
+
+function saveKmCombined() {
+  saveTariff( 'km_combined', document.querySelector('#km-combined-input').value );
+}
+
+function saveMinuteNormal() {
+
+  saveTariff( 'minute_normal', document.querySelector('#minute-normal-input').value );
+}
+
+function saveMinuteCombined() {
+  saveTariff( 'minute_combined', document.querySelector('#minute-combined-input').value );
+}
+
+function saveGetInNormal() {
+  saveTariff( 'get_in_normal', document.querySelector('#get-in-normal-input').value );
+}
+
+function saveGetInCombined() {
+  saveTariff( 'get_in_combined', document.querySelector('#get-in-combined-input').value );
+}
+
+function saveMinimalPriceNormal() {
+  saveTariff( 'minimal_price_normal', document.querySelector('#minimal-price-normal-input').value );
+}
+
+function saveMinimalPriceCombined() {
+  saveTariff( 'minimal_price_combined', document.querySelector('#minimal-price-combined-input').value );
+}
+
+function setCommission() {
+  saveTariff( 'commission', document.querySelector('#commission-input').value );
+}
+
+function saveWaitingMinutesFree() {
+  saveTariff( 'waiting_minutes_free', document.querySelector('#waiting-minutes-free-input').value );
+}
+
+function saveWaitingMinutePrice() {
+  saveTariff( 'waiting_minute_price', document.querySelector('#waiting-minute-price-input').value );
+}
+
+function saveFineForCancel() {
+  saveTariff( 'fine_for_cancel', document.querySelector('#fine-for-cancel-input').value );
+}
+
+
+
+
+function saveTariff(name, value) {
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          alert('Сохранено');
+
+
+        } else {
+          alert( 'Ошибка сохранения' );
+        }
+      }
+  };  
+
+  var json = JSON.stringify({
+    name:name,
+    value:value
+  });
+
+  xmlhttp.open('POST', '/api/v0.17.0/tariffs/saveTariff', true);
+  xmlhttp.setRequestHeader("Content-Type", "application/json");
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);  
+  xmlhttp.send(json);  
+}
+
+function getChats() {
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var json = JSON.parse( this.responseText );
+          var user;
+          var users = document.querySelector('#chats #chats-users');
+
+          while (users.firstChild) {
+            users.removeChild(users.firstChild);
+          }          
+
+          for(var i=0;i<json.length;i++) {
+
+            addUserToChatsUsers( json[i] );
+          }
+
+          startChatsUpdates(); // не потерять
+
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };  
+
+  xmlhttp.open('GET', '/api/v0.17.0/chats/getChatsForDispatcher', true);
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);  
+  xmlhttp.send();    
+}
+
+function addUserToChatsUsers( json_element ) {
+
+  var users = document.querySelector('#chats #chats-users');  
+
+  var user = document.createElement('div');
+  user.className = 'chat-user';            
+  user.setAttribute('data-phone', json_element.from_user);
+  user.setAttribute('data-last-number', json_element.last_number);
+  user.setAttribute('data-unread-messages', json_element.n_unread);
+  user.onclick = function() {
+    getChatMessages( 'dispatcher', user.getAttribute('data-phone') );
+
+    document.querySelector('#chat-send-panel').setAttribute('data-to-phone', user.getAttribute('data-phone') );
+  };
+
+  var usernamediv = document.createElement('div');
+  usernamediv.innerText = json_element.firstname + ' ' + json_element.lastname;
+
+  var phonediv = document.createElement('div');
+  phonediv.innerText = json_element.from_user;
+
+  var unreadmessagesdiv = document.createElement('div');
+  unreadmessagesdiv.className = 'unread-message-div';
+  unreadmessagesdiv.innerText = json_element.n_unread;
+
+  user.appendChild( usernamediv );
+  user.appendChild( phonediv );
+  user.appendChild( unreadmessagesdiv );
+
+  users.appendChild( user );
+}
+
+function getChatMessages( phone1, phone2 ) {
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var json = JSON.parse( this.responseText );
+
+          var chatmessagesdiv = document.querySelector('#chats #chat #chat-messages');
+          var chatmessage;
+
+          while (chatmessagesdiv.firstChild) {
+            chatmessagesdiv.removeChild(chatmessagesdiv.firstChild);
+          }
+
+          for(var i=0;i<json.length;i++)
+            addChatMessage( json[i] );
+
+          scrollChatDown();          
+
+          setAllMessagesRead( phone2, phone1 ); // shift them there
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };  
+
+  xmlhttp.open('GET', '/api/v0.17.0/chats/getMessages?phone1='+encodeURIComponent(phone1)+'&phone2='+encodeURIComponent(phone2), true);
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);  
+  xmlhttp.send();   
+}
+
+var updateIntervalId;
+var isupdating = false;
+var updateInterval = 5000;
+
+function startChatsUpdates() {
+  updateChats();
+  updateIntervalId = window.setInterval( updateChats, updateInterval );  
+}
+
+function stopChatsUpdates() {
+  window.clearInterval( updateIntervalId );
+}
+
+function updateChats() {
+  console.log("update() isupdating:", window.isupdating);
+
+  if( !window.isupdating ) {
+    getNewChatsMessages();
+  }    
+}
+
+function setAllMessagesRead(from_user,to_user) {
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var userdiv = document.querySelector('#chats-users .chat-user[data-phone="'+from_user+'"]');  
+          userdiv.setAttribute('data-unread-messages', 0);
+          userdiv.querySelector('.unread-message-div').innerText = 0;
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };  
+
+  xmlhttp.open('GET', '/api/v0.17.0/chats/setAllMessagesRead?from_user='+encodeURIComponent(from_user)+'&to_user='+encodeURIComponent(to_user), true);
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);  
+  xmlhttp.send();     
+}
+
+function getNewChatsMessages() {
+
+  window.isupdating = true;  
+
+  var users = document.querySelectorAll('#chats-users .chat-user');
+
+  var json_obj = [];
+
+  for(var i=0;i<users.length;i++) {
+
+    if( typeof users[i].getAttribute('data-last-number') === "undefined" )
+      continue;
+
+    json_obj.push({
+      from_user: users[i].getAttribute('data-phone'),
+      last_number: users[i].getAttribute('data-last-number')
+    });
+  }
+
+  var json = JSON.stringify( json_obj );
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.timeout = 10000; // 10 секунд    
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var json = JSON.parse( this.responseText );
+          var json_element;
+
+          for(var i=0;i<json.length;i++) {
+
+            json_element = json[i];
+
+            var from_user = json_element.from_user;
+
+            var userdiv = document.querySelector('#chats-users .chat-user[data-phone="'+from_user+'"]');
+            userdiv.setAttribute('data-last-number', json_element.last_number);
+
+            if( from_user == document.querySelector('#chat-send-panel').getAttribute('data-to-phone') ) {
+
+              for(var j=0;j<json_element.messages.length;j++)
+                addChatMessage( json_element.messages[j] );
+            }
+            else {
+
+              var nmessages = parseInt( userdiv.getAttribute('data-unread-messages') ) + json_element.messages.length;
+              userdiv.setAttribute('data-unread-messages', nmessages );
+              userdiv.querySelector('.unread-message-div').innerText = nmessages;
+
+            }
+          }
+
+          scrollChatDown();
+
+          window.isupdating = false;
+
+        } else {
+          alert( this.responseText );
+
+          window.isupdating = false;
+        }
+      }
+  };  
+  xmlhttp.ontimeout = function() {
+    console.log('timeout');
+    window.isupdating = false;
+  };    
+
+  xmlhttp.open('POST', '/api/v0.17.0/chats/getNewChatsMessages', true);
+  xmlhttp.setRequestHeader("Content-Type", "application/json");    
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);  
+  xmlhttp.send(json);  
+}
+
+function addChatMessage( json_element ) {
+
+  var chatmessagesdiv = document.querySelector('#chats #chat #chat-messages');
+
+  var chatmessage = document.createElement('div');
+  chatmessage.className = 'chat-message';
+
+  var fromuserdiv = document.createElement('div');
+  fromuserdiv.innerText = json_element.from_fullname;
+
+  var messagediv = document.createElement('div');
+  messagediv.innerText = json_element.message;
+
+  chatmessage.appendChild( fromuserdiv );
+  chatmessage.appendChild( messagediv );
+
+  chatmessagesdiv.appendChild( chatmessage );  
+}
+
+function scrollChatDown() {
+
+  var chatmessagesdiv = document.querySelector('#chats #chat #chat-messages');
+  chatmessagesdiv.scrollTo(0, chatmessagesdiv.scrollHeight);
+}
+
+function sendChatMessage() {
+
+  window.isupdating = true;
+
+  var to_user = document.querySelector('#chat-send-panel').getAttribute('data-to-phone');
+  var userdiv = document.querySelector('#chats-users .chat-user[data-phone="'+to_user+'"]');
+  var last_number = userdiv.getAttribute('data-last-number');
+
+  var json_element = {
+    sender_type: 'dispatcher',
+    from_user: 'dispatcher',
+    to_user:   document.querySelector('#chat-send-panel').getAttribute('data-to-phone'),
+    from_fullname: 'Диспетчер',
+    message:   document.querySelector('#chat-send-panel textarea').value,
+    last_number: last_number
+  };
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var json = JSON.parse( this.responseText );
+
+          for(var i=0;i<json.length;i++)
+            addChatMessage( json[i] );
+
+          userdiv.setAttribute('data-last-number', json[json.length-1].number);
+
+          document.querySelector('#chat-send-panel textarea').value = '';
+
+          window.isupdating = false;
+
+        } else {
+          alert( this.responseText );
+
+          window.isupdating = false;
+        }
+      }
+  };  
+  xmlhttp.ontimeout = function() {
+    console.log('timeout');
+    window.isupdating = false;
+  };    
+
+  var json = JSON.stringify( json_element );
+
+  xmlhttp.open('POST', '/api/v0.17.0/chats/sendMessage', true);
+  xmlhttp.setRequestHeader("Content-Type", "application/json");
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);  
+  xmlhttp.send(json);  
+}
+
+
+function getOrders() {
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var json = JSON.parse( this.responseText );
+
+          fillOrdersTable( json );
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };  
+
+  xmlhttp.open('GET', '/api/v0.17.0/orders/list', true);
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);  
+  xmlhttp.send();   
+}
+
+function doOrderSearch() {
+
+  var text = document.querySelector('#order-search-input').value;
+
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+
+        if( this.status == 200 ) {
+
+          console.log( this.responseText );
+
+          var json = JSON.parse( this.responseText );
+
+          fillOrdersTable( json );
+
+        } else {
+          alert( this.responseText );
+        }
+      }
+  };  
+
+  xmlhttp.open('GET', '/api/v0.17.0/orders/searchOrders?text='+text, true);
+  xmlhttp.setRequestHeader('Authorization', AUTH_KEY);  
+  xmlhttp.send();     
+}
+
+function fillOrdersTable( json ) {
+
+  var ordersTable = document.querySelector('#orders-table');
+
+  while (ordersTable.firstChild) {
+    ordersTable.removeChild(ordersTable.firstChild);
+  }
+
+  var orderRow = document.createElement('tr');
+  // bombilaRow.innerText = json[i].firstname + ' ' + json[i].lastname;
+  orderRow.className = 'orders-header';
+
+  var idCol = document.createElement('th');
+  var passengerCol = document.createElement('th');
+  var bombilaCol = document.createElement('th');
+  var fromAddressCol = document.createElement('th');
+  var toAddressCol = document.createElement('th');
+  var paymentMethodCol = document.createElement('th');
+  var tariffCol = document.createElement('th');
+  var priceCol = document.createElement('th');
+  var stateCol = document.createElement('th');
+  var canceledByPassengerCol = document.createElement('th');
+  var canceledByBombilaCol = document.createElement('th');
+  var orderDateCol = document.createElement('th');
+  var finishDateCol = document.createElement('th');
+
+  idCol.innerText = 'id';
+  passengerCol.innerText = 'Тел.пассажира';
+  bombilaCol.innerText = 'Тел.водителя';
+  fromAddressCol.innerText = 'Откуда';
+  toAddressCol.innerText = 'Куда';
+  paymentMethodCol.innerText = 'Метод оплаты';
+  tariffCol.innerText = 'Тариф';
+  priceCol.innerText = 'Стоимость';
+  stateCol.innerText = 'Статус';
+  canceledByPassengerCol.innerText = 'Отменён пассажиром';
+  canceledByBombilaCol.innerText = 'Отменён водителем';
+  orderDateCol.innerText = 'Дата заказа';
+  finishDateCol.innerText = 'Дата завершения';
+
+  orderRow.appendChild( idCol );
+  orderRow.appendChild( passengerCol );
+  orderRow.appendChild( bombilaCol );
+  orderRow.appendChild( fromAddressCol );
+  orderRow.appendChild( toAddressCol );
+  orderRow.appendChild( paymentMethodCol );
+  orderRow.appendChild( tariffCol );
+  orderRow.appendChild( priceCol );
+  orderRow.appendChild( stateCol );
+  orderRow.appendChild( canceledByPassengerCol );
+  orderRow.appendChild( canceledByBombilaCol );
+  orderRow.appendChild( orderDateCol );
+  orderRow.appendChild( finishDateCol );
+
+  ordersTable.appendChild( orderRow );          
+
+  for(var i=0;i<json.length;i++) {
+
+    var orderRow = document.createElement('tr');
+    orderRow.setAttribute('data-phone', json[i].phone);
+    // bombilaRow.innerText = json[i].firstname + ' ' + json[i].lastname;
+    orderRow.className = 'order';
+
+    var idCol = document.createElement('td');
+    var passengerCol = document.createElement('td');
+    var bombilaCol = document.createElement('td');
+    var fromAddressCol = document.createElement('td');
+    var toAddressCol = document.createElement('td');
+    var paymentMethodCol = document.createElement('td');
+    var tariffCol = document.createElement('td');
+    var priceCol = document.createElement('td');
+    var stateCol = document.createElement('td');
+    var canceledByPassengerCol = document.createElement('td');
+    var canceledByBombilaCol = document.createElement('td');
+    var orderDateCol = document.createElement('td');
+    var finishDateCol = document.createElement('td');
+
+    idCol.innerText = json[i].id;
+    passengerCol.innerText = json[i].passenger;
+    bombilaCol.innerText = json[i].bombila;
+    fromAddressCol.innerText = json[i].from_address;
+    toAddressCol.innerText = json[i].to_address;
+    paymentMethodCol.innerText = json[i].payment_method;
+    tariffCol.innerText = json[i].tariff;
+    priceCol.innerText = json[i].price;
+    stateCol.innerText = json[i].state;
+    canceledByPassengerCol.innerText = json[i].canceled_by_passenger;
+    canceledByBombilaCol.innerText = json[i].canceled_by_bombila;
+    orderDateCol.innerText = json[i].order_date;
+    finishDateCol.innerText = json[i].finish_date;
+
+    orderRow.appendChild( idCol );
+    orderRow.appendChild( passengerCol );
+    orderRow.appendChild( bombilaCol );
+    orderRow.appendChild( fromAddressCol );
+    orderRow.appendChild( toAddressCol );
+    orderRow.appendChild( paymentMethodCol );
+    orderRow.appendChild( tariffCol );
+    orderRow.appendChild( priceCol );
+    orderRow.appendChild( stateCol );
+    orderRow.appendChild( canceledByPassengerCol );
+    orderRow.appendChild( canceledByBombilaCol );
+    orderRow.appendChild( orderDateCol );
+    orderRow.appendChild( finishDateCol );
+
+    ordersTable.appendChild( orderRow );
+  }   
+
+  document.querySelector('#total-orders').innerText = json.length;
+}
+
+</script>
+
+</html>
